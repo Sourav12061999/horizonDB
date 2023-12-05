@@ -18,7 +18,7 @@ export default class Database extends ErrorHandler {
     }
     private async dbCreationHandler() {
         // This function is actally responsible for creating the database
-        const dbPath = join(__dirname, `/Databases/${this.db}`);
+        const dbPath = join(__dirname, `Databases/${this.db}`);
         const isExist = existsSync(dbPath);
         if (isExist) throw new Error(`Database "${this.db}" already exists`)
         await mkdir(dbPath);
