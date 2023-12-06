@@ -1,8 +1,6 @@
-export interface IBsonFileSchema {
-
-}
 
 export interface IBsonMetadata {
-
+    count: number;
+    indexes: number[]
 }
 

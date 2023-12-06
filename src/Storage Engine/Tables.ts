@@ -60,14 +60,12 @@ export default class Table extends ErrorHandler {
     }
     private async writeHandler(data: ISchema) {
         this.schemas.parse(data);
-        const fileDescriptor = openSync(join(this.dbPath, `${this.tableName}.bson`), 'a+');
+        const fileDescriptor = openSync(join(this.dbPath, `${this.tableName}`, `data.bson`), 'a+');
         const jsonData = JSON.stringify(data);
-
-
     }
     private async writeToMainFileHandler(data: ISchema) {
-        const startOffset = (await fsPromise.stat(join(this.dbPath, `${this.tableName}.bson`))).size;
-        const endOffset = (await fsPromise.stat(join(this.dbPath, `${this.tableName}.bson`))).size;
+        const startOffset = (await fsPromise.stat(join(this.dbPath, `${this.tableName}`, `data.bson`))).size;
+        const endOffset = (await fsPromise.stat(join(this.dbPath, `${this.tableName}`, `data.bson`))).size;
 
         const currentOffset: DataOffsetRange = [startOffset, endOffset];
         this.writeToIndexesHandler(currentOffset, 1);
