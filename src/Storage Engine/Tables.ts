@@ -1,11 +1,12 @@
 import { ZodObject, z } from "zod";
 import { ErrorHandler } from "../Utils";
 import { join } from "path";
-import { existsSync } from "fs";
+import { createWriteStream, existsSync } from "fs";
 import { readFile } from "fs/promises";
 import { BSON } from "bson";
 import { DataOffsetRange } from "../global.types";
-import { openSync, writeFileSync, closeSync, statSync, promises as fsPromise } from 'fs';
+import { openSync, writeFileSync, closeSync, statSync, promises as fsPromise, createReadStream } from 'fs';
+import { IBsonMetadata } from "./types";
 
 interface ISchema {
     [key: string]: "string" | "number" | "boolean";
@@ -43,7 +44,12 @@ export default class Table extends ErrorHandler {
         // Create 3 files 1 for the acctual data, 1 for the index and 1 for some meta data around the database
         await fsPromise.writeFile(join(tablePath, "data.bson"), '');
         await fsPromise.writeFile(join(tablePath, "indexes.bson"), '');
-        await fsPromise.writeFile(join(tablePath, "meta.bson"), '');
+        const metaData: IBsonMetadata = {
+            count: 0,
+            indexes: []
+        }
+        // Creates the meta.bson file & stores the meta data in the file
+        await fsPromise.writeFile(join(tablePath, "meta.bson"), BSON.serialize(metaData));
     }
     private async readHandler(): Promise<ISchema[]> {
         // Read existing data from the file
@@ -58,18 +64,29 @@ export default class Table extends ErrorHandler {
 
         //    }
     }
-    private async writeHandler(data: ISchema) {
-        this.schemas.parse(data);
-        const fileDescriptor = openSync(join(this.dbPath, `${this.tableName}`, `data.bson`), 'a+');
-        const jsonData = JSON.stringify(data);
+    async writeHandler(data: ISchema) {
+        this.errorHandler(() => {
+            this.schemas.parse(data);
+            this.writeToMainFileHandler(data);
+        });
+
     }
     private async writeToMainFileHandler(data: ISchema) {
-        const startOffset = (await fsPromise.stat(join(this.dbPath, `${this.tableName}`, `data.bson`))).size;
-        const endOffset = (await fsPromise.stat(join(this.dbPath, `${this.tableName}`, `data.bson`))).size;
+        // Reading the meta data
+        const bsonMeta = await fsPromise.readFile(join(this.dbPath, `${this.tableName}`, `meta.bson`));
+        const meta = BSON.deserialize(bsonMeta);
+        const count = meta.count;
+        const startOffset = (await fsPromise.stat(join(this.dbPath, `${this.tableName}`, `data.bson`))).size; // The offset before appending the data
 
-        const currentOffset: DataOffsetRange = [startOffset, endOffset];
-        this.writeToIndexesHandler(currentOffset, 1);
-
+        // This will append the bson data in the file with the incoming data and a space to identify each doc seperately
+        await fsPromise.appendFile(join(this.dbPath, `${this.tableName}`, `data.bson`), `${BSON.serialize(data)} `);
+        const endOffset = (await fsPromise.stat(join(this.dbPath, `${this.tableName}`, `data.bson`))).size - 1; // The offset after appending the data
+        const currentOffset: DataOffsetRange = [startOffset, endOffset]; // the range of offset in which the data exists
+        await this.writeToIndexesHandler(currentOffset, count + 1);
+        // When the insertion is complete increase the count by 1
+        meta.count++;
+        // Store the current count in the meta.bson file
+        await fsPromise.writeFile(join(this.dbPath, `${this.tableName}`, `meta.bson`), BSON.serialize(meta));
     }
 
     private async writeToIndexesHandler(offset: DataOffsetRange, id: number) {
