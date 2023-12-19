@@ -2,17 +2,18 @@ import { ErrorHandler } from "../Utils";
 import { mkdir, } from "fs/promises";
 import { existsSync } from "fs";
 import { join } from "path";
+import Table from "./Tables";
 export default class Database extends ErrorHandler {
-    db: string;
-    tables: string[];
-    constructor(db: string) {
+    db: string = "";
+    tables: Table[] = [];
+    private constructor(db: string, tables: Table[]) {
         super();
+        this.tables = tables;
         this.db = db;
-        this.tables = [];
-        this.craeteNewDatabase();
+
     }
 
-    private craeteNewDatabase() {
+    private craeteNewDatabaseHandler() {
         // Here the Error handler will take care of any errors that happens while creating a database connection
         this.errorHandler(this.dbCreationHandler);
     }
@@ -22,5 +23,13 @@ export default class Database extends ErrorHandler {
         const isExist = existsSync(dbPath);
         if (isExist) throw new Error(`Database "${this.db}" already exists`)
         await mkdir(dbPath);
+    }
+
+    static createNewDatabase(dbPath: string) {
+
+    }
+
+    static loadAllDatabases() {
+
     }
 }

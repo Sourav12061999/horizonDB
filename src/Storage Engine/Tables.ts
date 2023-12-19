@@ -1,11 +1,11 @@
 import { ZodObject, z } from "zod";
 import { ErrorHandler } from "../Utils";
 import { join } from "path";
-import { createWriteStream, existsSync } from "fs";
+import { existsSync } from "fs";
 import { readFile } from "fs/promises";
 import { BSON } from "bson";
 import { DataOffsetRange } from "./types";
-import { openSync, writeFileSync, closeSync, statSync, promises as fsPromise, createReadStream } from 'fs';
+import { promises as fsPromise } from 'fs';
 import { IBsonMetadata } from "./types";
 
 interface ISchema {
@@ -22,20 +22,29 @@ type ZodReturnType = ZodObject<IZodSchema, "strip", z.ZodTypeAny, {
 }>;
 export default class Table extends ErrorHandler {
     tableName: string;
-    schemas: ZodReturnType;
+    schemas?: ZodReturnType;
     dbPath: string;
-    constructor(tableName: string, schema: ISchema, dbPath: string) {
+    private constructor(tableName: string, schema: ISchema, dbPath: string) {
         super();
         this.tableName = tableName;
         this.dbPath = dbPath;
-        this.schemas = this.SchemaCreator(schema);
-        this.tableCreationHandler();
+
     }
 
+    async createNewTable(tableName: string, schema: ISchema, dbPath: string) {
+        const table = new Table(tableName, schema, dbPath);
+        await this.tableCreationHandler(schema);
+        return table;
+    }
+
+    async loadAllTables(dbPath: string) {
+
+    }
     async insertRow() { }
     async updateRow() { }
 
-    private async tableCreationHandler() {
+    private async tableCreationHandler(schema: ISchema) {
+        this.schemas = this.SchemaCreator(schema);
         const tablePath = join(this.dbPath, `${this.tableName}`);
         const isTableExists = existsSync(tablePath);
         if (isTableExists) throw new Error(`Database "${this.tableName}" already exists`);
@@ -66,7 +75,7 @@ export default class Table extends ErrorHandler {
     }
     async writeHandler(data: ISchema) {
         this.errorHandler(() => {
-            this.schemas.parse(data);
+            this.schemas?.parse(data);
             this.writeToMainFileHandler(data);
         });
 
