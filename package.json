@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/Sourav12061999/horizonDB#readme",
   "devDependencies": {
+    "@types/nearley": "^2.11.5",
     "@types/node": "^20.10.3",
     "nodemon": "^3.0.2",
     "rimraf": "^5.0.5",
@@ -31,6 +32,7 @@
   },
   "dependencies": {
     "bson": "^6.2.0",
+    "nearley": "^2.20.1",
     "zod": "^3.22.4"
   }
 }
