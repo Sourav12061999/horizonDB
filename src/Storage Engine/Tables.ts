@@ -4,7 +4,7 @@ import { join } from "path";
 import { createWriteStream, existsSync } from "fs";
 import { readFile } from "fs/promises";
 import { BSON } from "bson";
-import { DataOffsetRange } from "../global.types";
+import { DataOffsetRange } from "./types";
 import { openSync, writeFileSync, closeSync, statSync, promises as fsPromise, createReadStream } from 'fs';
 import { IBsonMetadata } from "./types";
 
