@@ -2,7 +2,7 @@ import { ZodObject, z } from "zod";
 import { ErrorHandler } from "../Utils";
 import { join } from "path";
 import { existsSync } from "fs";
-import { readFile } from "fs/promises";
+import { readFile, readdir } from "fs/promises";
 import { BSON } from "bson";
 import { DataOffsetRange } from "./types";
 import { promises as fsPromise } from 'fs';
@@ -22,32 +22,27 @@ type ZodReturnType = ZodObject<IZodSchema, "strip", z.ZodTypeAny, {
 }>;
 export default class Table extends ErrorHandler {
     tableName: string;
-    schemas?: ZodReturnType;
+    // schemas?: ZodReturnType;
     dbPath: string;
-    private constructor(tableName: string, schema: ISchema, dbPath: string) {
+    private constructor(tableName: string, dbPath: string) {
         super();
         this.tableName = tableName;
         this.dbPath = dbPath;
 
     }
 
-    async createNewTable(tableName: string, schema: ISchema, dbPath: string) {
-        const table = new Table(tableName, schema, dbPath);
-        await this.tableCreationHandler(schema);
+    // This method is to create a new Table
+    static async createNewTable(tableName: string, schema: ISchema, dbPath: string) {
+        const table = new Table(tableName, dbPath);
+        await this.tableCreationHandler(schema, dbPath, tableName);
         return table;
     }
-
-    async loadAllTables(dbPath: string) {
-
-    }
-    async insertRow() { }
-    async updateRow() { }
-
-    private async tableCreationHandler(schema: ISchema) {
-        this.schemas = this.SchemaCreator(schema);
-        const tablePath = join(this.dbPath, `${this.tableName}`);
+    //TODO This method will be called inside the createNewTable method it won't be used individually
+    private static async tableCreationHandler(schema: ISchema, dbPath: string, tableName: string) {
+        // this.schemas = this.SchemaCreator(schema);
+        const tablePath = join(dbPath, `${tableName}`);
         const isTableExists = existsSync(tablePath);
-        if (isTableExists) throw new Error(`Database "${this.tableName}" already exists`);
+        if (isTableExists) throw new Error(`Database "${tableName}" already exists`);
         // Create the folder with the table name
         await fsPromise.mkdir(tablePath);
         // Create 3 files 1 for the acctual data, 1 for the index and 1 for some meta data around the database
@@ -60,6 +55,23 @@ export default class Table extends ErrorHandler {
         // Creates the meta.bson file & stores the meta data in the file
         await fsPromise.writeFile(join(tablePath, "meta.bson"), BSON.serialize(metaData));
     }
+
+    // This method will be called to load all the tables within the database 
+    static async loadAllTables(dbPath: string) {
+        const files = await readdir(dbPath, { withFileTypes: true });
+        const tables = files
+            .filter(dirent => dirent.isDirectory())
+            .map(dirent => dirent.name);
+        return tables.map((table) => {
+            return new Table(table, dbPath);
+        })
+
+    }
+    async insertRow() { }
+    async updateRow() { }
+
+
+
     private async readHandler(): Promise<ISchema[]> {
         // Read existing data from the file
         // try {
@@ -75,7 +87,7 @@ export default class Table extends ErrorHandler {
     }
     async writeHandler(data: ISchema) {
         this.errorHandler(() => {
-            this.schemas?.parse(data);
+            // this.schemas?.parse(data);
             this.writeToMainFileHandler(data);
         });
 
@@ -118,5 +130,4 @@ export default class Table extends ErrorHandler {
         }
         return z.object(ZodSchema);
     }
-
 }
