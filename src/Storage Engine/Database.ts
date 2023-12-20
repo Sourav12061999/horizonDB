@@ -3,6 +3,10 @@ import { mkdir, readdir } from "fs/promises";
 import { existsSync } from "fs";
 import { join } from "path";
 import Table from "./Tables";
+
+interface TableStorage {
+    [key: string]: Table
+}
 export default class Database extends ErrorHandler {
     db: string = "";
     tables: Table[] = [];
