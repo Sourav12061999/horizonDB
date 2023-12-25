@@ -1,11 +1,12 @@
 import Database from "./Database";
+import { ISchema } from "./Tables";
 
 interface DatabaseStorage {
     [key: string]: Database;
 }
 export class StorageEngine {
     static storageInstance: StorageEngine | null = null;
-    private currentDatabase: Database | null = null;
+    private static currentDatabase: string | null = null;
     private static allDatabases: DatabaseStorage = {};
     private constructor() { }
 
@@ -23,5 +24,24 @@ export class StorageEngine {
         dbInstances.forEach(database => {
             StorageEngine.allDatabases[database.db] = database;
         })
+    }
+
+    static useDatabase(db: string) {
+        if (!this.allDatabases[db]) {
+            throw new Error(`Database ${db} does not exist`);
+        }
+        StorageEngine.currentDatabase = db;
+
+    }
+
+    static async createtable(tableName: string, schema: ISchema) {
+        if (!StorageEngine.currentDatabase) {
+            throw new Error(`No database selected`);
+        }
+        await this.allDatabases[this.currentDatabase!].createNewTable(tableName, schema);
+    }
+
+    static async createDatabase(dbName: string) {
+        StorageEngine.allDatabases[dbName] = await Database.craeteNewDatabaseHandler(dbName);
     }
 }

@@ -8,7 +8,7 @@ import { DataOffsetRange } from "./types";
 import { promises as fsPromise } from 'fs';
 import { IBsonMetadata } from "./types";
 
-interface ISchema {
+export interface ISchema {
     [key: string]: "string" | "number" | "boolean";
 }
 interface IZodSchema {

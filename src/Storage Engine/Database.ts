@@ -2,15 +2,15 @@ import { ErrorHandler } from "../Utils";
 import { mkdir, readdir } from "fs/promises";
 import { existsSync } from "fs";
 import { join } from "path";
-import Table from "./Tables";
+import Table, { ISchema } from "./Tables";
 
 interface TableStorage {
     [key: string]: Table
 }
 export default class Database extends ErrorHandler {
     db: string = "";
-    tables: Table[] = [];
-    private constructor(db: string, tables: Table[]) {
+    tables: TableStorage = {};
+    private constructor(db: string, tables: TableStorage) {
         super();
         this.tables = tables;
         this.db = db;
@@ -19,7 +19,7 @@ export default class Database extends ErrorHandler {
 
     static async craeteNewDatabaseHandler(dbName: string) {
         await Database.dbCreationHandler(dbName);
-        return new Database(dbName, []);
+        return new Database(dbName, {});
     }
     private static async dbCreationHandler(dbName: string) {
         // This function is actally responsible for creating the database
@@ -37,7 +37,15 @@ export default class Database extends ErrorHandler {
             .map(dirent => dirent.name);
         return databases.map(async (database) => {
             const tables = await Table.loadAllTables(join(__dirname, `Databases`, database));
-            return new Database(database, tables);
+            const tableObjectStorage: TableStorage = {}
+            tables.forEach((table) => {
+                tableObjectStorage[table.tableName] = table;
+            })
+            return new Database(database, tableObjectStorage);
         })
+    }
+
+    async createNewTable(tableName: string, schema: ISchema) {
+        this.tables[tableName] = await Table.createNewTable(tableName, schema, join(__dirname, `Databases`, this.db));
     }
 }
