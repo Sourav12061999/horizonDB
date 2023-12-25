@@ -48,4 +48,28 @@ export default class Database extends ErrorHandler {
     async createNewTable(tableName: string, schema: ISchema) {
         this.tables[tableName] = await Table.createNewTable(tableName, schema, join(__dirname, `Databases`, this.db));
     }
+
+    async readFromTable(tableName: string) {
+        if (!this.tables[tableName]) {                                                                                                                    
+            throw new Error(`Table ${tableName} not found`);
+        }
+
+        // TODO: Read from table in this line
+    }
+
+    async updateRow(tableName: string,) {
+        if (!this.tables[tableName]) {
+            throw new Error(`Table ${tableName} not found`);
+        }
+
+        // TODO: update the row in this line
+    }
+
+    async deleteRow(tableName: string,) {
+        if (!this.tables[tableName]) {
+            throw new Error(`Table ${tableName} not found`);
+        }
+
+        // TODO: delete the row in this line
+    }
 }

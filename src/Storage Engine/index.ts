@@ -1,3 +1,4 @@
+import { error } from "console";
 import Database from "./Database";
 import { ISchema } from "./Tables";
 
@@ -49,5 +50,24 @@ export class StorageEngine {
 
     async createDatabase(dbName: string) {
         this.allDatabases[dbName] = await Database.craeteNewDatabaseHandler(dbName);
+    }
+
+    async readFromTable(tableName: string) {
+        if (this.currentDatabase === null) {
+            throw new Error(`No database selected`);
+        }
+        this.allDatabases[this.currentDatabase]
+    }
+    async updteTableRow(tableName: string) {
+        if (this.currentDatabase === null) {
+            throw new Error(`No database selected`);
+        }
+        this.allDatabases[this.currentDatabase]
+    }
+    async deleteTableRow(tableName: string) {
+        if (this.currentDatabase === null) {
+            throw new Error(`No database selected`);
+        }
+        this.allDatabases[this.currentDatabase]
     }
 }
