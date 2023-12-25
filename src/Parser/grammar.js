@@ -1,5 +1,6 @@
 // Generated automatically by nearley, version 2.20.1
 // http://github.com/Hardmath123/nearley
+import reserved from './reserved.json';
 (function () {
   function id(x) { return x[0]; }
 
@@ -7,11 +8,7 @@
     //if(o && o.length==1 && o[0]) return drill(o[0]);
     return o;
   }
-
-  const reserved = require('./reserved.json');
   const valid_function_identifiers = ['LEFT', 'RIGHT', 'REPLACE', 'MOD']
-
-
   function tableRef(d, opts) {
     const { on, using, alias } = opts || {};
 
@@ -892,7 +889,9 @@
   }
   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = grammar;
-  } else {
+  } else if (windon) {
     window.grammar = grammar;
   }
 })();
+
+export default grammar;
