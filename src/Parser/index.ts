@@ -7,3 +7,5 @@ function parseSQL(query: string) {
 }
 
 console.log(parseSQL("delete from students where id = 2")[0]);
+
+export default parseSQL;

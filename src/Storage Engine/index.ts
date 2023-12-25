@@ -6,8 +6,8 @@ interface DatabaseStorage {
 }
 export class StorageEngine {
     static storageInstance: StorageEngine | null = null;
-    private static currentDatabase: string | null = null;
-    private static allDatabases: DatabaseStorage = {};
+    private currentDatabase: string | null = null;
+    private allDatabases: DatabaseStorage = {};
     private constructor() { }
 
     static async connect() {
@@ -19,29 +19,35 @@ export class StorageEngine {
     }
 
     private static async loadDatabases() {
+        if (StorageEngine.storageInstance === null) {
+            throw new Error("StorageEngine can't be null, there is some issue with loading databases");
+        }
         const dbs = await Database.loadAllDatabases();
         const dbInstances = await Promise.all(dbs);
         dbInstances.forEach(database => {
-            StorageEngine.allDatabases[database.db] = database;
+            if (StorageEngine.storageInstance === null) {
+                throw new Error("StorageEngine can't be null, there is some issue with loading databases");
+            }
+            StorageEngine.storageInstance.allDatabases[database.db] = database;
         })
     }
 
-    static useDatabase(db: string) {
+     useDatabase(db: string) {
         if (!this.allDatabases[db]) {
             throw new Error(`Database ${db} does not exist`);
         }
-        StorageEngine.currentDatabase = db;
+        this.currentDatabase = db;
 
     }
 
-    static async createtable(tableName: string, schema: ISchema) {
-        if (!StorageEngine.currentDatabase) {
+    async createtable(tableName: string, schema: ISchema) {
+        if (!this.currentDatabase) {
             throw new Error(`No database selected`);
         }
         await this.allDatabases[this.currentDatabase!].createNewTable(tableName, schema);
     }
 
-    static async createDatabase(dbName: string) {
-        StorageEngine.allDatabases[dbName] = await Database.craeteNewDatabaseHandler(dbName);
+    async createDatabase(dbName: string) {
+        this.allDatabases[dbName] = await Database.craeteNewDatabaseHandler(dbName);
     }
 }
