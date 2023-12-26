@@ -1,6 +1,8 @@
 // Generated automatically by nearley, version 2.20.1
 // http://github.com/Hardmath123/nearley
 import reserved from './reserved.json';
+
+var grammar;
 (function () {
   function id(x) { return x[0]; }
 
@@ -60,7 +62,7 @@ import reserved from './reserved.json';
       size: size && size[1]
     }
   }
-  var grammar = {
+  grammar = {
     Lexer: undefined,
     ParserRules: [
       { "name": "unsigned_int$ebnf$1", "symbols": [/[0-9]/] },

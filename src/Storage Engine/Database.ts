@@ -23,20 +23,20 @@ export default class Database extends ErrorHandler {
     }
     private static async dbCreationHandler(dbName: string) {
         // This function is actally responsible for creating the database
-        const dbPath = join(__dirname, `Databases/${dbName}`);
+        const dbPath = join(__dirname, "../", "../", `Databases/${dbName}`);
         const isExist = existsSync(dbPath);
         if (isExist) throw new Error(`Database "${dbName}" already exists`)
         await mkdir(dbPath);
     }
     // Loading all the existing databases complete
     static async loadAllDatabases() {
-        const Path = join(__dirname, `Databases`);
+        const Path = join(__dirname, "../","../", `Databases`);
         const Folders = await readdir(Path, { withFileTypes: true });
         const databases = Folders
             .filter(dirent => dirent.isDirectory())
             .map(dirent => dirent.name);
         return databases.map(async (database) => {
-            const tables = await Table.loadAllTables(join(__dirname, `Databases`, database));
+            const tables = await Table.loadAllTables(join(__dirname,"../","../", `Databases`, database));
             const tableObjectStorage: TableStorage = {}
             tables.forEach((table) => {
                 tableObjectStorage[table.tableName] = table;
@@ -46,11 +46,11 @@ export default class Database extends ErrorHandler {
     }
 
     async createNewTable(tableName: string, schema: ISchema) {
-        this.tables[tableName] = await Table.createNewTable(tableName, schema, join(__dirname, `Databases`, this.db));
+        this.tables[tableName] = await Table.createNewTable(tableName, schema, join(__dirname,"../", "../", `Databases`, this.db));
     }
 
     async readFromTable(tableName: string) {
-        if (!this.tables[tableName]) {                                                                                                                    
+        if (!this.tables[tableName]) {
             throw new Error(`Table ${tableName} not found`);
         }
 

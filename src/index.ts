@@ -8,10 +8,10 @@ class Main {
         StorageEngine.connect().then((engine) => {
             this.storageEngine = engine;
             afterSetupCallback();
-         });
+        });
     }
 
-    static async connect(afterSetupCallback: () => void){
+    static async connect(afterSetupCallback: () => void) {
         if (!Main.instance) {
             Main.instance = new Main(afterSetupCallback);
 
@@ -28,7 +28,7 @@ class Main {
     private async methodCallHandler(ast: any) {
 
         if (!this.storageEngine) {
-            throw new Error("StorageEngine setup is not complete yet."); 
+            throw new Error("StorageEngine setup is not complete yet.");
         }
         switch (ast.type) {
             case "create_database":
@@ -51,3 +51,7 @@ class Main {
         }
     }
 }
+
+const main = Main.connect(() => {
+    console.log("Setup complete");
+});

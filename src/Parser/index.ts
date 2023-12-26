@@ -1,7 +1,7 @@
-import grammar  from "./grammar";
+import * as grammar from "./grammar";
 import * as nearley from 'nearley';
 function parseSQL(query: string) {
-    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar));
+    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar as any));
     parser.feed(query);
     return parser.results[0];
 }
