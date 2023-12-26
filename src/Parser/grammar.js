@@ -1,8 +1,5 @@
 // Generated automatically by nearley, version 2.20.1
 // http://github.com/Hardmath123/nearley
-import reserved from './reserved.json';
-
-var grammar;
 (function () {
   function id(x) { return x[0]; }
 
@@ -10,7 +7,11 @@ var grammar;
     //if(o && o.length==1 && o[0]) return drill(o[0]);
     return o;
   }
+
+  const reserved = require('./reserved.json');
   const valid_function_identifiers = ['LEFT', 'RIGHT', 'REPLACE', 'MOD']
+
+
   function tableRef(d, opts) {
     const { on, using, alias } = opts || {};
 
@@ -62,7 +63,7 @@ var grammar;
       size: size && size[1]
     }
   }
-  grammar = {
+  var grammar = {
     Lexer: undefined,
     ParserRules: [
       { "name": "unsigned_int$ebnf$1", "symbols": [/[0-9]/] },
@@ -891,9 +892,7 @@ var grammar;
   }
   if (typeof module !== 'undefined' && typeof module.exports !== 'undefined') {
     module.exports = grammar;
-  } else if (windon) {
+  } else {
     window.grammar = grammar;
   }
 })();
-
-export default grammar;

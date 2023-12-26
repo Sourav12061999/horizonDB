@@ -14,14 +14,16 @@ class Main {
     static async connect(afterSetupCallback: () => void) {
         if (!Main.instance) {
             Main.instance = new Main(afterSetupCallback);
-
         }
+        return Main.instance
 
 
     }
 
     async parser(query: string) {
-        const ast = parseSQL(query);
+        const ast = parseSQL(query)[0];
+        console.log("Here is the ast tree for my query:------------------------------", JSON.stringify(ast));
+        
         await this.methodCallHandler(ast)
     }
 
@@ -52,6 +54,8 @@ class Main {
     }
 }
 
-const main = Main.connect(() => {
+Main.connect(() => {
     console.log("Setup complete");
+    Main.instance?.parser("delete from names where id = 1");
+
 });

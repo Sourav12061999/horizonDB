@@ -1,11 +1,16 @@
-import * as grammar from "./grammar";
-import * as nearley from 'nearley';
+// import grammar from "./grammar";
+// import * as nearley from 'nearley';
+const grammar = require("./grammar");
+// import { Parser, Grammar } from "nearley";
+const nearly = require("nearley");
 function parseSQL(query: string) {
-    const parser = new nearley.Parser(nearley.Grammar.fromCompiled(grammar as any));
+    console.log(query);
+    
+    const parser = new nearly.Parser(nearly.Grammar.fromCompiled(grammar as any));
     parser.feed(query);
-    return parser.results[0];
+    return parser.results;
 }
 
-console.log(parseSQL("delete from students where id = 2")[0]);
+// console.log(parseSQL("delete from students where id = 2")[0]);
 
 export default parseSQL;
