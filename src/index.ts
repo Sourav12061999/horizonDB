@@ -25,7 +25,7 @@ class Main {
         const ast = parseSQL(query)[0];
         console.log(JSON.stringify(ast));
         
-        await this.methodCallHandler(ast)
+        // await this.methodCallHandler(ast)
     }
 
     private async methodCallHandler(ast: any) {
@@ -41,7 +41,10 @@ class Main {
                 await this.storageEngine.createDatabase(ast?.name?.value);
                 return;
             case "use_database":
-                this.storageEngine.useDatabase("");
+                if (!ast?.name?.value) {
+                    throw new Error("Syntax error in use database");
+                }
+                this.storageEngine.useDatabase(ast?.name?.value);
                 return;
             case "create_table":
                 await this.storageEngine.createtable("", {});
@@ -60,6 +63,6 @@ class Main {
 
 Main.connect(() => {
     console.log("Setup complete");
-    Main.instance?.parser("create database masai");
+    Main.instance?.parser("use masai");
 
 });
