@@ -172,7 +172,7 @@
       { "name": "create_database$subexpression$2", "symbols": [/[dD]/, /[aA]/, /[tT]/, /[aA]/, /[bB]/, /[aA]/, /[sS]/, /[eE]/], "postprocess": function (d) { return d.join(""); } },
       {
         "name": "create_database", "symbols": ["create_database$subexpression$1", "_", "create_database$subexpression$2", "_", "identifier"], "postprocess":
-          d => ({ type: 'create_database', name: d[2] })
+          d => ({ type: 'create_database', name: d[4] })
       },
       { "name": "create_table$subexpression$1", "symbols": [/[cC]/, /[rR]/, /[eE]/, /[aA]/, /[tT]/, /[eE]/], "postprocess": function (d) { return d.join(""); } },
       { "name": "create_table$subexpression$2", "symbols": [/[tT]/, /[aA]/, /[bB]/, /[lL]/, /[eE]/], "postprocess": function (d) { return d.join(""); } },

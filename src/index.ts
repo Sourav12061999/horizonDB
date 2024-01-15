@@ -4,6 +4,7 @@ import parseSQL from "./Parser";
 class Main {
     storageEngine: StorageEngine | null = null;
     static instance: Main | null = null;
+    selectedDB: string | null = null;
     private constructor(afterSetupCallback: () => void) {
         StorageEngine.connect().then((engine) => {
             this.storageEngine = engine;
@@ -22,7 +23,7 @@ class Main {
 
     async parser(query: string) {
         const ast = parseSQL(query)[0];
-        console.log("Here is the ast tree for my query:------------------------------", JSON.stringify(ast));
+        console.log(JSON.stringify(ast));
         
         await this.methodCallHandler(ast)
     }
@@ -34,7 +35,10 @@ class Main {
         }
         switch (ast.type) {
             case "create_database":
-                await this.storageEngine.createDatabase("");
+                if (!ast?.name?.value) {
+                    throw new Error("Syntax error in create database");
+                }
+                await this.storageEngine.createDatabase(ast?.name?.value);
                 return;
             case "use_database":
                 this.storageEngine.useDatabase("");
@@ -56,6 +60,6 @@ class Main {
 
 Main.connect(() => {
     console.log("Setup complete");
-    Main.instance?.parser("delete from names where id = 1");
+    Main.instance?.parser("create database masai");
 
 });
