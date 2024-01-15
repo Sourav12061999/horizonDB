@@ -1,6 +1,6 @@
 
 import { StorageEngine } from "./Storage Engine";
-import parseSQL from "./Parser";
+import Parser from "./Parser";
 class Main {
     storageEngine: StorageEngine | null = null;
     static instance: Main | null = null;
@@ -22,7 +22,7 @@ class Main {
     }
 
     async parser(query: string) {
-        const ast = parseSQL(query)[0];
+        const ast = Parser.parseSQL(query)[0];
         console.log(JSON.stringify(ast));
         
         // await this.methodCallHandler(ast)
@@ -41,9 +41,7 @@ class Main {
                 await this.storageEngine.createDatabase(ast?.name?.value);
                 return;
             case "use_database":
-                if (!ast?.name?.value) {
-                    throw new Error("Syntax error in use database");
-                }
+                
                 this.storageEngine.useDatabase(ast?.name?.value);
                 return;
             case "create_table":
@@ -63,6 +61,6 @@ class Main {
 
 Main.connect(() => {
     console.log("Setup complete");
-    Main.instance?.parser("use masai");
+    Main.instance?.parser(`select * from students where id = 1`);
 
 });
