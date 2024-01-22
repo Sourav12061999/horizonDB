@@ -178,18 +178,20 @@
       { "name": "create_table$subexpression$2", "symbols": [/[tT]/, /[aA]/, /[bB]/, /[lL]/, /[eE]/], "postprocess": function (d) { return d.join(""); } },
       {
         "name": "create_table", "symbols": ["create_table$subexpression$1", "_", "create_table$subexpression$2", "_", "identifier", "_", { "literal": "(" }, "_", "columnDefs", "_", { "literal": ")" }], "postprocess":
-          d => ({ type: 'create_table', name: d[2], definitions: d[4] })
+          d => ({ type: 'create_table', name: d[4], definitions: d[8] })
       },
       { "name": "columnDefs$ebnf$1", "symbols": [] },
       { "name": "columnDefs$ebnf$1$subexpression$1", "symbols": [{ "literal": "," }, "_", "columnDef"] },
       { "name": "columnDefs$ebnf$1", "symbols": ["columnDefs$ebnf$1", "columnDefs$ebnf$1$subexpression$1"], "postprocess": function arrpush(d) { return d[0].concat([d[1]]); } },
       {
-        "name": "columnDefs", "symbols": ["columnDef", "columnDefs$ebnf$1"], "postprocess":
-          d => [d[0]].concat(d[1] ? d[1].map(dd => dd[3]) : [])
+        "name": "columnDefs",
+        "symbols": ["columnDef", "columnDefs$ebnf$1"],
+        "postprocess": d => [d[0], ...d[1].map(dd => dd[2])]
       },
       {
-        "name": "columnDef", "symbols": ["identifier", "_", "dataType"], "postprocess":
-          d => ({ name: d[0], dataType: d[2] })
+        "name": "columnDef",
+        "symbols": ["identifier", "_", "dataType"],
+        "postprocess": d => ({ name: d[0], dataType: d[2] })
       },
       { "name": "dataType$subexpression$1", "symbols": [/[iI]/, /[nN]/, /[tT]/], "postprocess": function (d) { return d.join(""); } },
       { "name": "dataType", "symbols": ["dataType$subexpression$1"] },

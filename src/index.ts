@@ -30,21 +30,21 @@ class Main {
 
     private async methodCallHandler(ast: any) {
 
+        let database;
         if (!this.storageEngine) {
             throw new Error("StorageEngine setup is not complete yet.");
         }
         switch (ast.type) {
             case "create_database":
-                if (!ast?.name?.value) {
-                    throw new Error("Syntax error in create database");
-                }
-                await this.storageEngine.createDatabase(ast?.name?.value);
+                database = Parser.createDatabase(ast);
+                await this.storageEngine.createDatabase(database);
                 return;
             case "use_database":
-                
-                this.storageEngine.useDatabase(ast?.name?.value);
+                database = Parser.useDatabase(ast);
+                this.storageEngine.useDatabase(database);
                 return;
             case "create_table":
+                database = Parser.createTable(ast);
                 await this.storageEngine.createtable("", {});
                 return;
 
@@ -53,6 +53,7 @@ class Main {
                 return;
 
             case "delete":
+                
                 await this.storageEngine.deleteTableRow("")
                 return;
         }
@@ -61,6 +62,6 @@ class Main {
 
 Main.connect(() => {
     console.log("Setup complete");
-    Main.instance?.parser(`select * from students where id = 1`);
+    Main.instance?.parser(`create table students (id integer, name varchar, age varchar)`);
 
 });

@@ -16,8 +16,6 @@ class Parser {
         return parser.results;
     }
 
-    // console.log(parseSQL("delete from students where id = 2")[0]);
-
     static createDatabase(ast: any): string {
         if (!ast?.name?.value) {
             throw new Error("Syntax error in create database");
@@ -36,7 +34,16 @@ class Parser {
         return ast.name.value
     }
 
-    static updateDatabase(ast: any) { }
+    static updateDatabase(ast: any) { 
+        if (!ast?.table?.value) {
+            throw new Error("Syntax error in update database")
+        }
+        const dbName = ast.table.value;
+        if (!ast?.set) {
+            throw new Error("Syntax error in update database")
+        }
+
+    }
 
     static deleteDatabase(ast: any) { }
 
